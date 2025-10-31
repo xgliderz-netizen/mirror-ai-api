@@ -1,30 +1,48 @@
 import express from "express";
 import fetch from "node-fetch";
+import dotenv from "dotenv";
 import cors from "cors";
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+dotenv.config(); // 🔑 Load environment variables
 
-const PORT = process.env.PORT || 3000;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// Gemini API Key from .env or Replit Secret
+const apiKey = process.env.GEMINI_API_KEY;
+
+if (!apiKey) {
+  console.error("❌ GEMINI_API_KEY not found. Please set it in .env or Replit Secrets.");
+  process.exit(1);
+}
+
+app.get("/", (req, res) => {
+  res.send("✅ Mirror-AI API is live");
+});
 
 app.post("/ask", async (req, res) => {
   try {
     const { question, language } = req.body;
+    if (!question) return res.status(400).json({ error: "Question missing" });
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: question }] }],
-        }),
+          contents: [
+            {
+              parts: [{ text: question }]
+            }
+          ]
+        })
       }
     );
 
-    const data = await geminiRes.json();
+    const data = await response.json();
+
     const answer =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "Sorry, I couldn’t answer that.";
@@ -32,8 +50,9 @@ app.post("/ask", async (req, res) => {
     res.json({ answer });
   } catch (err) {
     console.error("Error:", err);
-    res.status(500).json({ answer: "Internal server error." });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.listen(PORT, () => console.log(`✅ Mirror AI API running on ${PORT}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Mirror-AI running on port ${PORT}`));
