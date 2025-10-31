@@ -1,17 +1,30 @@
 {
-  "name": "mirror-ai-api",
+  "name": "mirror-ai",
   "version": "1.0.0",
+  "description": "Mirror Talk AI – Voice-based chatbot using Google Gemini API",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
+  "keywords": [
+    "gemini",
+    "ai",
+    "voice",
+    "mirror",
+    "chatbot",
+    "express"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "node-fetch": "^3.3.2",
-    "cors": "^2.8.5"
+    "@google/generative-ai": "^0.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
   },
-  "engines": {
-    "node": "18.x"
+  "devDependencies": {
+    "nodemon": "^3.0.3"
   }
 }
